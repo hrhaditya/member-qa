@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+requests
+pydantic
+python-dateutil
+dateparser
+regex
+rapidfuzz
+sentence-transformers
+pytest
+spacy
+sentence-transformers==2.7.0
+torch
