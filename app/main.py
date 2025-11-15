@@ -1,12 +1,29 @@
-# app/main.py
 from fastapi import FastAPI
 from app.schemas import AskRequest, AskResponse
 from app.nlp import parse_question
 from app.index import INDEX
 from app.qa import extract_when, extract_how_many
 
-app = FastAPI()
+app = FastAPI(
+    title="Member-QA API",
+    description="Ask natural-language questions about member messages.",
+    version="1.0.0"
+)
 
+# ---------------------------------------------------------
+# ROOT ENDPOINT (Fixes the 'Not Found' issue on Render)
+# ---------------------------------------------------------
+@app.get("/")
+def root():
+    return {
+        "status": "ok",
+        "message": "Member-QA API is running. Use POST /ask to query."
+    }
+
+
+# ---------------------------------------------------------
+# MAIN QUESTION-ANSWERING ENDPOINT
+# ---------------------------------------------------------
 @app.post("/ask", response_model=AskResponse)
 def ask(req: AskRequest) -> AskResponse:
     parsed = parse_question(req.question)
@@ -46,7 +63,7 @@ def ask(req: AskRequest) -> AskResponse:
                 }
             )
 
-    # fallback: full message
+    # fallback: full message as answer
     return AskResponse(
         answer=msg,
         evidence={
@@ -57,7 +74,9 @@ def ask(req: AskRequest) -> AskResponse:
     )
 
 
-# debug endpoint
+# ---------------------------------------------------------
+# DEBUGGING ENDPOINT
+# ---------------------------------------------------------
 @app.get("/test")
 def test():
     layla_messages = [
